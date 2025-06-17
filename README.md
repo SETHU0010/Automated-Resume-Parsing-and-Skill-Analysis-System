@@ -1,54 +1,55 @@
-# 🧠 Intelligent Resume Parser using AI and Regex
+# 🧠 Automated Resume Parsing and Skill Analysis System
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![Flask](https://img.shields.io/badge/Flask-Web_Framework-yellow.svg)
-![PDF](https://img.shields.io/badge/Support-.pdf%20%2F%20.docx-brightgreen)
-![Gemini](https://img.shields.io/badge/AI-Google%20Gemini-ff69b4)
+A Flask-based AI-enhanced web application that intelligently parses resumes and extracts structured metadata (skills, education, contact info, experience) using both traditional and modern NLP methods, including Google Gemini API and regex fallback mechanisms.
 
 ---
 
-## ❓ Problem Statement
+## 📌 Problem Statement
 
-Recruiters and hiring managers face challenges when screening large volumes of resumes. Manually extracting relevant information such as **skills, experience, and qualifications** is:
-
-- Time-consuming  
-- Error-prone  
-- Inconsistent  
-
-This slows down the hiring process and increases the risk of overlooking qualified candidates.
+Recruiters and hiring managers often face the challenge of sifting through large volumes of resumes to find suitable candidates. Manual resume screening is **time-consuming**, **error-prone**, and **inconsistent**, often leading to missed opportunities and inefficient hiring processes.
 
 ---
 
 ## 🎯 Aim
 
-To automate the extraction of structured information from resumes by building a web application that uses both **traditional regex-based methods** and **modern AI (Google Gemini)** for **intelligent parsing**.
+To develop an automated system that extracts relevant structured metadata from resumes in `.pdf` and `.docx` formats, thereby improving recruitment efficiency through AI-powered parsing.
 
 ---
 
 ## 🥅 Goal
 
-- ✅ Minimize manual resume screening.
-- ✅ Improve accuracy and consistency in data extraction.
-- ✅ Support scalable and quick parsing of `.pdf` and `.docx` files.
-- ✅ Provide a simple, user-friendly interface to view extracted metadata.
+- Automate the resume screening process.
+- Extract information like name, email, phone, skills, education, and experience.
+- Enhance accuracy using AI (Google Gemini) and ensure fallback support through regex.
+- Build a user-friendly web interface for uploading and viewing results.
 
 ---
 
-## 💡 Solution Overview
+## ✅ Solution
 
-The system extracts structured metadata like:
-
-- 🧑 Name, 📞 Phone Number, 📧 Email
-- 🛠️ Skills, 💼 Experience, 🎓 Education
-- 📜 Certifications
-
-### 🔍 Dual Extraction Strategy:
-
-1. **Primary Method (AI-based)**: Google Gemini API – context-aware, high-accuracy extraction.
-2. **Fallback Method (Regex-based)**: Traditional regex & keyword match when AI fails.
+- A web application developed using **Flask**.
+- Supports **resume uploads** in `.pdf` and `.docx` formats.
+- Extracts plain text using:
+  - `PyPDF2` for PDFs
+  - `python-docx` for DOCX files
+- Uses two-stage metadata extraction:
+  1. **Primary Method:** Google Gemini API (Generative AI)
+  2. **Fallback Method:** Regex and keyword-based extraction
+- Displays structured information in JSON format and via a results webpage.
 
 ---
 
+## 🚀 Features
+
+- 🔍 AI-powered resume metadata extraction
+- 📄 Multi-format file support (.pdf and .docx)
+- 🔁 Fallback parsing using regex
+- 🧠 Real-time resume ranking and skill similarity
+- 📤 Secure file upload with `secure_filename()`
+- 🌐 Clean and interactive web UI
+- 🧾 Outputs structured JSON metadata
+
+---
 ## ✅ Advantages
 
 - ⚙️ **Automated Parsing**: Eliminates manual extraction.
@@ -80,63 +81,37 @@ The system extracts structured metadata like:
 - 🌐 Simple and intuitive web interface using Flask
 - 🔒 Handles file uploads securely with validation
 
----
+## 🔧 Tech Stack
 
-## 🛠️ Tech Stack
-
-| Layer        | Technology                          |
-|--------------|--------------------------------------|
-| Backend      | Python, Flask                        |
-| AI Service   | Google Gemini API                    |
-| Text Parsing | PyPDF2, python-docx                  |
-| Extraction   | Regex, Keyword Matching              |
-| Frontend     | HTML, CSS (Bootstrap)                |
-| Data Format  | JSON Output                          |
-
+| Category        | Technologies Used                                  |
+|-----------------|----------------------------------------------------|
+| **Backend**     | Python, Flask, Regex, Gemini API                   |
+| **Frontend**    | HTML, CSS                                          |
+| **Parsing**     | PyPDF2, python-docx                                |
+| **NLP**         | Sentence-BERT, Cosine Similarity                   |
+| **AI Services** | Google Gemini API (Generative AI)                  |
 
 ---
 
-## 🧪 Sample Output (JSON)
+## 🧭 Workflow
 
-```json
-{
-  "name": "Sethumadhavan V",
-  "email": "sethumadhavanvelu2002@gmail.com",
-  "phone": "9159299878",
-  "skills": ["Python", "Flask", "SQL", "Power BI", "Machine Learning"],
-  "education": [
-    {
-      "degree": "M.Tech in Software Engineering",
-      "university": "Vellore Institute of Technology",
-      "cgpa": "7.65"
-    }
-  ],
-  "experience": [
-    {
-      "role": "Data Science Intern",
-      "company": "XYZ Company",
-      "duration": "Jan 2024 - Apr 2024"
-    }
-  ],
-  "certifications": [
-    "Power BI Essentials",
-    "SQL for Data Analysis"
-  ]
-}
+```text
+User Uploads Resume (.pdf/.docx)
+        ↓
+Extract Text Using PyPDF2 / python-docx
+        ↓
+Chunk Large Texts (Optional)
+        ↓
+Primary Parsing: Google Gemini API
+        ↓         ↘
+ Success      Failure
+   ↓             ↓
+Structured Metadata (JSON) via Regex
+        ↓
+Display Results on Web Page (result_ai.html)
 
-📂 Project Structure
+##  📌 Conclusion
+This project bridges the gap between manual resume screening and modern AI-driven automation. By combining AI (Gemini) and traditional regex techniques, it delivers a flexible, scalable, and intelligent resume parser suitable for recruiters, HR platforms, and job portals.
 
-intelligent-resume-parser/
-│
-├── app.py                 # Main Flask application
-├── templates/
-│   ├── index.html         # Upload form UI
-│   └── result_ai.html     # Results page UI
-├── static/                # CSS/JS files (optional)
-├── resume_parser/
-│   ├── extractor.py       # Regex and keyword-based methods
-│   ├── gemini_api.py      # Gemini API integration
-│   └── utils.py           # Helper functions
-├── uploads/               # Uploaded resumes (auto-created)
-├── requirements.txt       # Python dependencies
-└── README.md              # Project documentation
+
+Let me know if you'd like me to create a `requirements.txt`, Dockerfile, or `app.py` template for your project as well.
