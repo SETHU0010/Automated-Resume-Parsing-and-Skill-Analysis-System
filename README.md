@@ -93,24 +93,6 @@ The system extracts structured metadata like:
 | Frontend     | HTML, CSS (Bootstrap)                |
 | Data Format  | JSON Output                          |
 
----
-
-## 🧱 Architecture
-+----------------+ +---------------------+
-| Upload Resume | --> | Text Extraction |
-+----------------+ | (.pdf/.docx Parsing) |
-+----------+----------+
-|
-v
-+-----------------------------------+
-| Metadata Extraction (AI + Regex) |
-+--------+--------------------------+
-|
-v
-+-------------------------------+
-| Return Structured JSON Output |
-+-------------------------------+
-
 
 ---
 
@@ -158,65 +140,3 @@ intelligent-resume-parser/
 ├── uploads/               # Uploaded resumes (auto-created)
 ├── requirements.txt       # Python dependencies
 └── README.md              # Project documentation
-
-
-🧑‍💻 How to Run Locally
-Clone the Repository
-
-bash
-Copy
-Edit
-git clone https://github.com/SETHU0010/intelligent-resume-parser.git
-cd intelligent-resume-parser
-Create a Virtual Environment
-
-bash
-Copy
-Edit
-python -m venv venv
-source venv/bin/activate  # On Windows use: venv\Scripts\activate
-Install Dependencies
-
-bash
-Copy
-Edit
-pip install -r requirements.txt
-Add Your Gemini API Key
-
-Create a .env file and include:
-
-env
-Copy
-Edit
-GEMINI_API_KEY=your_gemini_api_key_here
-Run the Application
-
-bash
-Copy
-Edit
-python app.py
-Visit in Browser
-
-cpp
-Copy
-Edit
-http://127.0.0.1:5000/
-📈 Future Enhancements
-🧠 Add support for ChatGPT / Claude API fallback
-
-📊 Add visual dashboard for parsed data summary
-
-🖇️ Connect to ATS systems or HR databases
-
-🔐 Implement user authentication for multi-user environments
-
-📂 Add bulk upload and zip file support
-
-☁️ Deploy using Docker or Streamlit Cloud
-
-👨‍💻 Author
-Sethumadhavan V
-📧 sethumadhavanvelu2002@gmail.com
-📱 +91 91592 99878
-🌐 GitHub: SETHU0010
-
