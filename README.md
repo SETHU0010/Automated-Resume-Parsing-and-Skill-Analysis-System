@@ -93,6 +93,10 @@ To develop an automated system that extracts relevant structured metadata from r
 
 ---
 
+##  📌 Conclusion
+This project bridges the gap between manual resume screening and modern AI-driven automation. By combining AI (Gemini) and traditional regex techniques, it delivers a flexible, scalable, and intelligent resume parser suitable for recruiters, HR platforms, and job portals.
+
+
 ## 🧭 Workflow
 
 ```text
@@ -110,8 +114,4 @@ Structured Metadata (JSON) via Regex
         ↓
 Display Results on Web Page (result_ai.html)
 
-##  📌 Conclusion
-This project bridges the gap between manual resume screening and modern AI-driven automation. By combining AI (Gemini) and traditional regex techniques, it delivers a flexible, scalable, and intelligent resume parser suitable for recruiters, HR platforms, and job portals.
 
-
-Let me know if you'd like me to create a `requirements.txt`, Dockerfile, or `app.py` template for your project as well.
