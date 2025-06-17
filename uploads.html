@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Matcher</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        .highlight-row {
+            background-color: #d4edda;
+        }
+        .btn {
+            margin-right: 10px;
+        }
+        #results-table th, #results-table td {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">💼 Resume Matcher</h1>
+        <form id="upload-form">
+            <div class="mb-3">
+                <label for="job_description" class="form-label fw-bold">📝 Job Description</label>
+                <textarea class="form-control" id="job_description" rows="5" placeholder="Enter job description here..." required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="files" class="form-label fw-bold">📁 Upload Resumes (PDF/DOCX)</label>
+                <input type="file" class="form-control" id="files" multiple required>
+            </div>
+            <div class="mb-3 d-flex flex-wrap justify-content-center">
+                <button type="submit" id="submit-btn" class="btn btn-success">🚀 Submit</button>
+                <button type="button" id="top-five-btn" class="btn btn-primary">🏆 Top Five Resumes</button>
+                <button type="button" id="all-resumes-btn" class="btn btn-secondary">📋 All Resumes</button>
+                <button type="button" id="download-top5-btn" class="btn btn-warning">⬇️ Download Top 5 (ZIP)</button>
+                <button type="button" id="download-remaining-emails-btn" class="btn btn-info">📨 Download Remaining Emails</button>
+            </div>
+        </form>
+
+        <div id="loading-spinner" style="display:none;" class="text-center my-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-2">Processing resumes, please wait...</p>
+        </div>
+
+        <table class="table table-bordered table-hover table-striped mt-4" id="results-table" style="display:none;">
+            <thead class="table-dark">
+                <tr>
+                    <th>📄 Filename</th>
+                    <th>📊 Similarity</th>
+                    <th>👤 Name</th>
+                    <th>✉️ Email</th>
+                    <th>📥 Download</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let resultsData = [];
+
+        document.getElementById("top-five-btn").addEventListener("click", async function () {
+            await handleRequest('/top5');
+        });
+
+        document.getElementById("all-resumes-btn").addEventListener("click", async function () {
+            await handleRequest('/upload');
+        });
+
+        document.getElementById("upload-form").addEventListener("submit", async function (event) {
+            event.preventDefault();
+            await handleRequest('/upload');
+        });
+
+        document.getElementById("download-top5-btn").addEventListener("click", async function () {
+            if (resultsData.length === 0) {
+                alert("No results available to download.");
+                return;
+            }
+
+            try {
+                const response = await axios.post('/download/top5', resultsData, {
+                    headers: { 'Content-Type': 'application/json' },
+                    responseType: 'blob'
+                });
+
+                const blob = new Blob([response.data], { type: 'application/zip' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'top_5_resumes.zip';
+                link.click();
+            } catch (error) {
+                alert("An error occurred while downloading the ZIP file.");
+                console.error("Error:", error);
+            }
+        });
+
+        document.getElementById("download-remaining-emails-btn").addEventListener("click", async function () {
+            if (resultsData.length === 0) {
+                alert("No results available to download.");
+                return;
+            }
+
+            const sortedResults = [...resultsData].sort((a, b) => b.similarity_score - a.similarity_score);
+            const remainingResumes = sortedResults.slice(5); // Remaining after top 5
+
+            if (remainingResumes.length === 0) {
+                alert("No remaining resumes to download emails from.");
+                return;
+            }
+
+            try {
+                const response = await axios.post('/download/remaining-emails', remainingResumes, {
+                    headers: { 'Content-Type': 'application/json' },
+                    responseType: 'blob'
+                });
+
+                const blob = new Blob([response.data], { type: 'text/plain' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'remaining_emails.txt';
+                link.click();
+            } catch (error) {
+                alert("An error occurred while downloading the remaining emails.");
+                console.error("Error:", error);
+            }
+        });
+
+        async function handleRequest(endpoint) {
+            const jobDescription = document.getElementById("job_description").value;
+            const files = document.getElementById("files").files;
+
+            if (!jobDescription) {
+                alert("Please enter a job description.");
+                return;
+            }
+
+            if (files.length === 0) {
+                alert("Please upload at least one resume.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("job_description", jobDescription);
+
+            for (let i = 0; i < files.length; i++) {
+                formData.append("files", files[i]);
+            }
+
+            document.getElementById("loading-spinner").style.display = "block";
+            document.getElementById("results-table").style.display = "none";
+
+            try {
+                const response = await axios.post(endpoint, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+
+                document.getElementById("loading-spinner").style.display = "none";
+                const results = response.data;
+                resultsData = results;
+
+                const tableBody = document.querySelector("#results-table tbody");
+                tableBody.innerHTML = "";
+
+                results.forEach((result, index) => {
+                    const row = document.createElement("tr");
+
+                    // Highlight top 5
+                    if (index < 5) row.classList.add("highlight-row");
+
+                    row.innerHTML = `
+                        <td>${result.filename}</td>
+                        <td>${(result.similarity_score * 100).toFixed(2)}%</td>
+                        <td>${result.metadata.name || "N/A"}</td>
+                        <td>${result.metadata.email || "N/A"}</td>
+                        <td><a href="/download/${result.filename}" class="btn btn-outline-success btn-sm">Download</a></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                document.getElementById("results-table").style.display = "table";
+            } catch (error) {
+                document.getElementById("loading-spinner").style.display = "none";
+                alert("An error occurred while processing your request. Please try again.");
+                console.error("Error:", error);
+            }
+        }
+    </script>
+</body>
+</html>

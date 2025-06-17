@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Metadata Extraction</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Upload Resumes</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="files" id="files" multiple accept=".pdf,.docx" required />
+        <button type="submit">Upload</button>
+    </form>
+
+    <h2>Extracted Metadata</h2>
+    <div id="results"></div>
+
+    <button id="downloadExcel" style="display:none;">Download Excel</button>
+
+<script>
+$('#uploadForm').on('submit', function(e) {
+    e.preventDefault();
+    var formData = new FormData(this);
+
+    $('#results').html('<p>Processing files...</p>');
+    $('#downloadExcel').hide();
+
+    $.ajax({
+        url: '/upload',
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function(data) {
+            if (data.error) {
+                $('#results').html('<p style="color:red;">' + data.error + '</p>');
+                $('#downloadExcel').hide();
+                return;
+            }
+
+            if (data.length === 0) {
+                $('#results').html('<p>No data found.</p>');
+                $('#downloadExcel').hide();
+                return;
+            }
+
+            let table = '<table border="1" cellpadding="5" cellspacing="0"><thead><tr><th>Filename</th>';
+            let keys = Object.keys(data[0].metadata);
+            keys.forEach(key => {
+                table += `<th>${key.replace(/_/g, ' ').toUpperCase()}</th>`;
+            });
+            table += '</tr></thead><tbody>';
+
+            data.forEach(item => {
+                table += `<tr><td>${item.filename}</td>`;
+                keys.forEach(k => {
+                    let val = item.metadata[k];
+                    if (Array.isArray(val)) {
+                        val = val.join(", ");
+                    }
+                    if (!val) val = "";
+                    table += `<td>${val}</td>`;
+                });
+                table += '</tr>';
+            });
+
+            table += '</tbody></table>';
+            $('#results').html(table);
+
+            $('#downloadExcel').show();
+        },
+        error: function(xhr) {
+            $('#results').html('<p style="color:red;">Error uploading files.</p>');
+            $('#downloadExcel').hide();
+        }
+    });
+});
+
+$('#downloadExcel').on('click', function() {
+    window.location.href = '/download_excel';
+});
+</script>
+</body>
+</html>
